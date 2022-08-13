@@ -2,7 +2,13 @@ use iced::{Application, button, Command, Element, Settings, text_input, TextInpu
 use iced::Font::Default;
 
 fn main() -> iced::Result {
-    Counter::run(Settings::default())
+    let mut settings = Settings::default();
+    settings.window.decorations = true;
+    settings.window.transparent = false;
+    settings.window.size = (800, 200);
+    settings.window.max_size = Some(settings.window.size);
+    settings.window.min_size = Some(settings.window.size);
+    Counter::run(settings)
 }
 
 #[derive(Debug, Clone)]
@@ -57,7 +63,7 @@ impl Application for Counter {
                 self.value -= 1;
             }
             Message::RefreshContent(c) => {
-                self.content =c
+                self.content = c
             }
         }
 
