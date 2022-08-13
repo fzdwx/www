@@ -1,24 +1,31 @@
-use iced::{Application, button, Command, Element, Settings};
-use iced::{Button, Column, Text};
-
-struct Counter {
-    // The counter value
-    value: i32,
-
-    // The local state of the two buttons
-    increment_button: button::State,
-    decrement_button: button::State,
-}
+use iced::{Application, button, Command, Element, Settings, text_input, TextInput};
+use iced::Font::Default;
 
 fn main() -> iced::Result {
     Counter::run(Settings::default())
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Message {
     IncrementPressed,
     DecrementPressed,
+    RefreshContent(String),
 }
+
+struct Counter {
+    // The counter value
+    value: i32,
+    // the app title
+    title: String,
+
+    // The local state of the two buttons
+    increment_button: button::State,
+    decrement_button: button::State,
+
+    contentState: text_input::State,
+    content: String,
+}
+
 
 impl Application for Counter {
     type Executor = iced::executor::Default;
@@ -28,14 +35,17 @@ impl Application for Counter {
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         return (Counter {
             value: 0,
-            increment_button: Default::default(),
-            decrement_button: Default::default(),
+            title: String::from("A Counter"),
+            increment_button: button::State::new(),
+            decrement_button: button::State::new(),
+            contentState: text_input::State::new(),
+            content: String::from(""),
         },
                 Command::none());
     }
 
     fn title(&self) -> String {
-        String::from("test")
+        self.title.clone()
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {
@@ -46,29 +56,39 @@ impl Application for Counter {
             Message::DecrementPressed => {
                 self.value -= 1;
             }
+            Message::RefreshContent(c) => {
+                self.content =c
+            }
         }
 
         return Command::none();
     }
 
+
     fn view(&mut self) -> Element<Message> {
-        // We use a column: a simple vertical layout
-        Column::new()
-            .push(
-                // The increment button. We tell it to produce an
-                // `IncrementPressed` message when pressed
-                Button::new(&mut self.increment_button, Text::new("+"))
-                    .on_press(Message::IncrementPressed),
-            )
-            .push(
-                // We show the value of the counter here
-                Text::new(&self.value.to_string()).size(50),
-            )
-            .push(
-                // The decrement button. We tell it to produce a
-                // `DecrementPressed` message when pressed
-                Button::new(&mut self.decrement_button, Text::new("-"))
-                    .on_press(Message::DecrementPressed),
-            ).into()
+        let content = self.content.clone();
+        TextInput::new(&mut self.contentState, "11111111", content.as_str(), |msg| -> Message{
+            println!("{}", msg);
+            return Message::RefreshContent(msg);
+        }).into()
+        // // We use a column: a simple vertical layout
+        // Column::new()
+        //     .push(
+        //         // The increment button. We tell it to produce an
+        //         // `IncrementPressed` message when pressed
+        //         Button::new(&mut self.increment_button, Text::new("+"))
+        //             .on_press(Message::IncrementPressed),
+        //     )
+        //     .push(
+        //         // We show the value of the counter here
+        //         Text::new(&self.value.to_string()).size(50),
+        //     )
+        //     .push(
+        //         // The decrement button. We tell it to produce a
+        //         // `DecrementPressed` message when pressed
+        //         Button::new(&mut self.decrement_button, Text::new("-"))
+        //             .on_press(Message::DecrementPressed),
+        //     ).into()
     }
 }
+
